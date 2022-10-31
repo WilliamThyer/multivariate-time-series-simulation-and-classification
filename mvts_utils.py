@@ -120,7 +120,7 @@ def convert_to_xy(df):
     
     return x,y
 
-def downsample(x,y,num_samples_per_class):
+def downsample(y,num_samples_per_class):
 
     idx = np.arange(len(y))
     idxa = idx[y==0][:num_samples_per_class]
@@ -130,7 +130,6 @@ def downsample(x,y,num_samples_per_class):
 
     return x[idx_downsamp], y[idx_downsamp]
  
-
 def make_prepared_dataset(time, noise):
 
     a,b = make_time_series_for_classification(time)
@@ -143,3 +142,25 @@ def make_prepared_dataset(time, noise):
     x,y = convert_to_xy(df_feat)
 
     return x, y
+
+class DownsampleStratifiedShuffleSplit:
+
+    def __init__(self, n_splits=3, test_size=.2, num_samples=None):
+        self.n_splits = n_splits
+        self.test_size = test_size
+        self.shuffle = StratifiedShuffleSplit(n_splits=self.n_splits, test_size=test_size)
+        self.num_samples = num_samples
+
+    def split(self, X, y, groups=None):
+
+        for train_idx, test_idx in self.shuffle.split(x_downsamp,y_downsamp):
+
+            downsamp0 = train_idx[y[train_idx]==0][:self.num_samples]
+            downsamp1 = train_idx[y[train_idx]==1][:self.num_samples]
+            train_idx_downsamp = np.concatenate([downsamp0, downsamp1])
+
+            yield train_idx_downsamp, test_idx 
+
+    def get_n_splits(self):
+        return self.n_splits
+
