@@ -6,7 +6,7 @@ import pandas as pd
 from tsfresh.feature_extraction import extract_features  
 
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_val_score, StratifiedShuffleSplit
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
@@ -153,7 +153,7 @@ class DownsampleStratifiedShuffleSplit:
 
     def split(self, X, y, groups=None):
 
-        for train_idx, test_idx in self.shuffle.split(x_downsamp,y_downsamp):
+        for train_idx, test_idx in self.shuffle.split(X,y):
 
             downsamp0 = train_idx[y[train_idx]==0][:self.num_samples]
             downsamp1 = train_idx[y[train_idx]==1][:self.num_samples]
